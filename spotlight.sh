@@ -58,6 +58,7 @@ searchTerms=$(jq -r ".ad.title_destination_url.u" <<< $item | sed 's/.*q=\([^&]*
 
 mkdir -p "$dataPath"
 img="$dataPath/current_background.jpg"
+rm -f "$img"
 
 wget -qO "$img" "$landscapeUrl"
 sha256calculated=$(sha256sum $img | cut -d " " -f 1)
