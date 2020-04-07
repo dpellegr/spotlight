@@ -100,18 +100,19 @@ gsettings set "org.gnome.desktop.background" picture-uri "'file://$spotlightPath
 
 if [ -n "$minKeepMinutes" ] && [ $minKeepMinutes -gt 0 ]
 then
-	downloadTime=$(stat -c '%Y' $previousImagePath)
+	downloadTime=$(stat -c '%Z' "$previousImagePath")
 	currentTime=$(date +%s)
-	neededDuration=$((60 * $minKeepMinuts))
-	[ $(($currentTime - $downloadTime)) -ge $neededDutation ] && keepImage=true || keepImage=false
+	neededDuration=$(( 60 * "$minKeepMinutes" ))
+echo $downloadTime $currentTime $((currentTime-downloadTime))
+	[ $(($currentTime - $downloadTime)) -ge $neededDuration ] && keepImage=true || keepImage=false
 fi
 
 if [ "$keepImage" = false ] && [ -n "$previousImagePath" ] && [ -f "$previousImagePath" ] && [ "$imagePath" != "$previousImagePath" ]
 then
 	rm "$previousImagePath"
-	echo "Previous image removed"
+	message "Discarded previous background" "info"
 else
-	echo "Previous image kept"
+	message "Previous background kept as $previousImagePath" "info"
 fi
 
 notify-send "Background changed" "$title ($searchTerms)" --icon=preferences-desktop-wallpaper --urgency=low #--hint=string:desktop-entry:spotlight
