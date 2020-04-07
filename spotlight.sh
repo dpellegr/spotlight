@@ -14,9 +14,11 @@ useJournal=false
 
 conf_file="$spotlightPath/spotlight.conf"
 
-if [ -f "$conf_file" ]; then
+if [ -f "$conf_file" ]
+then
         source "$conf_file"
 elif [ -f "/etc/spotlight.conf" ]
+then
 	source "/etc/spotlight.conf"
 fi
 

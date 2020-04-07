@@ -2,13 +2,12 @@
 # Contributor: dpellegr
 
 pkgname=spotlight
-pkgver=32.64dc1db
+pkgver=51.cfe922d
 pkgrel=1
 pkgdesc="Displays a new background image daily"
 arch=('any')
 license=('GPL')
 url="https://github.com/dpellegr/spotlight"
-install=spotlight.install
 depends=('wget'
          'jq'
          'gnome-settings-daemon'
