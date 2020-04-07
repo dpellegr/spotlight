@@ -2,27 +2,41 @@
 
 dataPath="${XDG_DATA_HOME:-$HOME/.local/share}"
 
+dataPath=/home/dario/Nextcloud
+
+# spotlight working directory - where the link to the current background is stored
 spotlightPath="$dataPath/spotlight"
-backgroundsPath="$dataPath/backgrounds"
+
+# archive directory - contains all the saved backgrounds
+backgroundsPath="$dataPath/spotlight/backgrounds"
 
 keepImage=false
+useJournal=false
 
 function showHelp()
 {
-	echo "Usage: $0 [-k] [-d <destination>]"
+	echo "Usage: $0 [-j] [-k] [-d <destination>] [-m <min-keep-minutes>]"
 	echo ""
 	echo "Options:"
 	echo "	-h shows this help message"
+	echo "	-j push the output messages to systemd journal instead of stdout. This option should be passed when launched from a service file."
 	echo "	-k keeps the previous image"
 	echo "	-d stores the image into the given destination. Defaults to \"$HOME/.local/share/backgrounds\"."
+	echo "	-m the current background is not stored if has been kept for less than \"m\" minutes, implies -k."
 }
 
-while getopts "hkd:" opt
+while getopts "hjkd:m:" opt
 do
 	case $opt
 	in
+		'j')
+			useJournal=true
+		;;
 		'k')
 			keepImage=true
+		;;
+		'm')
+			minKeepMinutes=$OPTARG
 		;;
 		'd')
 			backgroundsPath=$OPTARG
@@ -34,6 +48,16 @@ do
 	esac
 done
 
+function message()
+{
+	if [ "$useJournal" = true ]
+        then
+		systemd-cat -t spotlight -p $2 <<< "$1"
+	else
+		echo "$2: $1"
+	fi
+}
+
 function decodeURL
 {
 	printf "%b\n" "$(sed 's/+/ /g; s/%\([0-9A-F][0-9A-F]\)/\\x\1/g')"
@@ -44,7 +68,7 @@ status=$?
 
 if [ $status -ne 0 ]
 then
-	systemd-cat -t spotlight -p emerg <<< "Query failed"
+	message "Query failed" "emerg"
 	exit $status
 fi
 
@@ -56,6 +80,7 @@ title=$(jq -r ".ad.title_text.tx" <<< $item)
 searchTerms=$(jq -r ".ad.title_destination_url.u" <<< $item | sed "s/.*q=\([^&]*\).*/\1/" | decodeURL)
 
 mkdir -p "$backgroundsPath"
+mkdir -p "$spotlightPath"
 imagePath="$backgroundsPath/$(date +%y-%m-%d-%H-%M-%S)-$title ($searchTerms).jpg"
 
 wget -qO "$imagePath" "$landscapeUrl"
@@ -63,22 +88,31 @@ sha256calculated=$(sha256sum "$imagePath" | cut -d " " -f 1)
 
 if [ "$sha256" != "$sha256calculated" ]
 then
-	systemd-cat -t spotlight -p emerg <<< "Checksum incorrect"
+	message "Checksum incorrect" "emerg"
 	exit 1
 fi
-
-gsettings set "org.gnome.desktop.background" picture-options "zoom"
-gsettings set "org.gnome.desktop.background" picture-uri "'file://$imagePath'"
-
-mkdir -p "$spotlightPath"
 
 previousImagePath="$(readlink "$spotlightPath/background.jpg")"
 ln -sf "$imagePath" "$spotlightPath/background.jpg"
 
+gsettings set "org.gnome.desktop.background" picture-options "zoom"
+gsettings set "org.gnome.desktop.background" picture-uri "'file://$spotlightPath/background.jpg'"
+
+if [ -n "$minKeepMinutes" ] && [ $minKeepMinutes -gt 0 ]
+then
+	downloadTime=$(stat -c '%Y' $previousImagePath)
+	currentTime=$(date +%s)
+	neededDuration=$((60 * $minKeepMinuts))
+	[ $(($currentTime - $downloadTime)) -ge $neededDutation ] && keepImage=true || keepImage=false
+fi
+
 if [ "$keepImage" = false ] && [ -n "$previousImagePath" ] && [ -f "$previousImagePath" ] && [ "$imagePath" != "$previousImagePath" ]
 then
 	rm "$previousImagePath"
+	echo "Previous image removed"
+else
+	echo "Previous image kept"
 fi
 
 notify-send "Background changed" "$title ($searchTerms)" --icon=preferences-desktop-wallpaper --urgency=low #--hint=string:desktop-entry:spotlight
-systemd-cat -t spotlight -p info <<< "Background changed to $title ($searchTerms)"
+message "Background changed to $title ($searchTerms)" "info"

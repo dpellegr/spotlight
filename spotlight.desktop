@@ -2,7 +2,7 @@
 Name=Spotlight
 Comment=Fetch a new background image from Spotlight
 Keywords=background;wallpaper;
-Exec=/usr/bin/spotlight.sh
+Exec=/usr/bin/spotlight.sh -j
 Icon=preferences-desktop-wallpaper
 Terminal=false
 Type=Application
