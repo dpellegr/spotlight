@@ -2,16 +2,23 @@
 
 dataPath="${XDG_DATA_HOME:-$HOME/.local/share}"
 
-dataPath=/home/dario/Nextcloud
-
 # spotlight working directory - where the link to the current background is stored
 spotlightPath="$dataPath/spotlight"
 
 # archive directory - contains all the saved backgrounds
 backgroundsPath="$dataPath/spotlight/backgrounds"
 
+
 keepImage=false
 useJournal=false
+
+conf_file="$spotlightPath/spotlight.conf"
+
+if [ -f "$conf_file" ]; then
+        source "$conf_file"
+elif [ -f "/etc/spotlight.conf" ]
+	source "/etc/spotlight.conf"
+fi
 
 function showHelp()
 {
@@ -81,7 +88,7 @@ searchTerms=$(jq -r ".ad.title_destination_url.u" <<< $item | sed "s/.*q=\([^&]*
 
 mkdir -p "$backgroundsPath"
 mkdir -p "$spotlightPath"
-imagePath="$backgroundsPath/$(date +%y-%m-%d-%H-%M-%S)-$title ($searchTerms).jpg"
+backgroundPath="$backgroundsPath/$(date +%y-%m-%d-%H-%M-%S)-$title ($searchTerms).jpg"
 
 wget -qO "$imagePath" "$landscapeUrl"
 sha256calculated=$(sha256sum "$imagePath" | cut -d " " -f 1)
