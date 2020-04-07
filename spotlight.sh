@@ -90,7 +90,7 @@ searchTerms=$(jq -r ".ad.title_destination_url.u" <<< $item | sed "s/.*q=\([^&]*
 
 mkdir -p "$backgroundsPath"
 mkdir -p "$spotlightPath"
-backgroundPath="$backgroundsPath/$(date +%y-%m-%d-%H-%M-%S)-$title ($searchTerms).jpg"
+imagePath="$backgroundsPath/$(date +%y-%m-%d-%H-%M-%S)-$title ($searchTerms).jpg"
 
 wget -qO "$imagePath" "$landscapeUrl"
 sha256calculated=$(sha256sum "$imagePath" | cut -d " " -f 1)
@@ -107,7 +107,7 @@ ln -sf "$imagePath" "$spotlightPath/background.jpg"
 gsettings set "org.gnome.desktop.background" picture-options "zoom"
 gsettings set "org.gnome.desktop.background" picture-uri "'file://$spotlightPath/background.jpg'"
 
-if [ -n "$minKeepMinutes" ] && [ $minKeepMinutes -gt 0 ]
+if [ -f "$previousImagePath" ] && [ -n "$minKeepMinutes" ] && [ $minKeepMinutes -ge 0 ]
 then
 	downloadTime=$(stat -c '%Z' "$previousImagePath")
 	currentTime=$(date +%s)

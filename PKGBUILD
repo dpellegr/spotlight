@@ -2,7 +2,7 @@
 # Contributor: dpellegr
 
 pkgname=spotlight
-pkgver=51.cfe922d
+pkgver=52.c7dd873
 pkgrel=1
 pkgdesc="Displays a new background image daily"
 arch=('any')
