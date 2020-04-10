@@ -112,7 +112,6 @@ then
 	downloadTime=$(stat -c '%Z' "$previousImagePath")
 	currentTime=$(date +%s)
 	neededDuration=$(( 60 * "$minKeepMinutes" ))
-echo $downloadTime $currentTime $((currentTime-downloadTime))
 	[ $(($currentTime - $downloadTime)) -ge $neededDuration ] && keepImage=true || keepImage=false
 fi
 
