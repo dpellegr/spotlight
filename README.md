@@ -2,50 +2,56 @@
 Windows 10 Spotlight Background images for Gnome
 
 ## Installation
-### System-wide
-* /usr/bin/spotlight.sh
-* /usr/lib/systemd/user/spotlight.service
-* /usr/lib/systemd/user/spotlight.timer
-* /usr/share/applications/spotlight.desktop
-### Local
-* ~/.local/bin/spotlight.sh
-* ~/.local/share/systemd/user/spotlight.service
-* ~/.local/share/systemd/user/spotlight.timer
-* ~/.local/share/applications/spotlight.desktop
-### Dependencies
+Make sure that the following **dependencies** are satisfied:
 * wget
 * jq
 * sed
 * glib2 (gnome)
-* systemd
+* systemd [optional]
+
+### Arch Linux
+Use the provided PKGBUILD.
+
+### Other Distributions
+Depending if you want a system-wide user-wise availability you should put the provided files in the following paths
+#### System-wide
+* /usr/bin/spotlight.sh
+* /etc/spotlight.conf
+* /usr/lib/systemd/user/spotlight.service
+* /usr/lib/systemd/user/spotlight.timer
+* /usr/share/applications/spotlight.desktop
+#### Local
+* ~/.local/bin/spotlight.sh
+* ~/.local/share/spotlight/spotlight.conf
+* ~/.local/share/systemd/user/spotlight.service
+* ~/.local/share/systemd/user/spotlight.timer
+* ~/.local/share/applications/spotlight.desktop
 
 ## Usage
-Run `systemctl --user enable spotlight.timer` to get a new picture every day.
+Call from the terminal `spotlight.sh` to get a new background. Alternatively, the `.desktop` file allows to run the script by browsing the application menu.
 
-To fetch a new background manually you can either use the desktop entry by looking for _spotlight_ in your gnome application menu (`[SUPER] spot... [ENTER]`) or trigger the service from command line with `systemctl --user start spotlight.service`.
+A systemd timer is provided to run the script periodically (daily by default). To enable it:
+`systemctl --user enable spotlight.timer`
 
-Use the system log to get the past image descriptions, e.g. for the the current background `journalctl -t spotlight -n 1`.
+It is also possible to run the script manually through systemd:
+`systemctl --user start spotlight.service`
+
+The descriptions of the images are stored in the systemd journa or printed on the terminal depending if the `-j` option was passed to the script. By default the `-j` option is passed when the script is called via the application menu and systemd. To query the journal for the descriptions of the last 10 images, you can do: 
+`journalctl -t spotlight -n 10`.
 
 ## Configuration
 
-Spotlight does not require particular configuration.
+Spotlight does not require particular configuration, however it has some options to control if and where the previous backgrounds are stored.
 
-The default behavior of spotlight is to discard the previous image when it fetches a new one. This behavior can be alter from the command line:
+All the options are available on the command line:
 
- * -h shows a help message
+ * -h shows this help message
+ * -j push the output messages to systemd journal instead of stdout. This option should be passed when launched from a service file.
  * -k keeps the previous image
- * -d stores the image into the given destination. Defaults to "$HOME/.local/share/backgrounds".
+ * -d stores the image into the given destination. Defaults to \"$HOME/.local/share/backgrounds\".
+ * -m the current background is not stored if has been kept for less than \"m\" minutes, implies -k.
+ 
+The `-d` and `-m` options can also be setted by mean of the `spotlight.conf` file. Spotlight looks for options in `/etc/spotlight.conf`, `~/.local/share/spotlight/spotlight.conf` and finally on the command line; each, if present, overrides the previous.
 
-### Service
-
-In order to modify the behavior of the service `systemctl edit --user spotlight.service` can be used to overwrite the program invocation:
-
-```
-[Service]
-ExecStart=
-ExecStart=/usr/bin/env bash spotlight.sh -k -d %h/Pictures/Spotlight
-```
-
-## Packages
-### Arch Linux
-[aur/spotlight](https://aur.archlinux.org/packages/spotlight/)
+## Acknowledgments
+Spotlight was originally implemented by [mariusknaust](https://github.com/mariusknaust/spotlight).
