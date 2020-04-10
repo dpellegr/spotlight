@@ -36,7 +36,7 @@ A systemd timer is provided to run the script periodically (daily by default). T
 It is also possible to run the script manually through systemd:
 `systemctl --user start spotlight.service`
 
-The descriptions of the images are stored in the systemd journa or printed on the terminal depending if the `-j` option was passed to the script. By default the `-j` option is passed when the script is called via the application menu and systemd. To query the journal for the descriptions of the last 10 images, you can do: 
+The descriptions of the images get stored in the systemd journal or printed on the terminal depending if the `-j` option is passed to the script. By default the `-j` option is passed when the script is called via the application menu and systemd. To query the journal for the descriptions of the last 10 images, you can do: 
 `journalctl -t spotlight -n 10`.
 
 ## Configuration
