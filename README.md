@@ -51,7 +51,7 @@ All the options are available on the command line:
  * -d stores the image into the given destination. Defaults to \"$HOME/.local/share/backgrounds\".
  * -m the current background is not stored if has been kept for less than \"m\" minutes, implies -k.
  
-The `-d` and `-m` options can also be setted by mean of the `spotlight.conf` file. Spotlight looks for options in `/etc/spotlight.conf`, `~/.local/share/spotlight/spotlight.conf` and finally on the command line; each, if present, overrides the previous.
+The `-d` and `-m` options can also be set by mean of the `spotlight.conf` file. Spotlight looks for options in `/etc/spotlight.conf`, `~/.local/share/spotlight/spotlight.conf` and finally on the command line; each, if present, overriding the previous.
 
 ## Acknowledgments
 Spotlight was originally implemented by [mariusknaust](https://github.com/mariusknaust/spotlight).
