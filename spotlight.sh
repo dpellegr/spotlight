@@ -72,7 +72,7 @@ function decodeURL
 	printf "%b\n" "$(sed 's/+/ /g; s/%\([0-9A-F][0-9A-F]\)/\\x\1/g')"
 }
 
-response=$(wget -qO- -U "WindowsShellClient/0" "https://arc.msn.com/v3/Delivery/Cache?pid=279978&fmt=json&lc=en,en-US&ctry=US")
+response=$(wget -qO- -U "WindowsShellClient/0" "https://arc.msn.com/v3/Delivery/Placement?pid=209567&fmt=json&cdm=1&lc=en,en-US&ctry=US")
 status=$?
 
 if [ $status -ne 0 ]
@@ -123,5 +123,5 @@ else
 	message "Previous background kept as $previousImagePath" "info"
 fi
 
-notify-send "Background changed" "$title ($searchTerms)" --icon=preferences-desktop-wallpaper --urgency=low #--hint=string:desktop-entry:spotlight
+notify-send "Background changed" "$title ($searchTerms)" --icon=preferences-desktop-wallpaper --urgency=low --hint=string:desktop-entry:spotlight
 message "Background changed to $title ($searchTerms)" "info"
