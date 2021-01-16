@@ -53,5 +53,9 @@ All the options are available on the command line:
  
 The `-d` and `-m` options can also be set by mean of the `spotlight.conf` file. Spotlight looks for options in `/etc/spotlight.conf`, `~/.local/share/spotlight/spotlight.conf` and finally on the command line; each, if present, overriding the previous.
 
+### Notifications
+
+Notifications can be controlled via the Gnome Control Center.
+
 ## Acknowledgments
-Spotlight was originally implemented by [mariusknaust](https://github.com/mariusknaust/spotlight).
+Spotlight was originally implemented and is maintained by [mariusknaust](https://github.com/mariusknaust/spotlight).
